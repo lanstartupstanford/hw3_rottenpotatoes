@@ -33,4 +33,43 @@ When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
   # HINT: use String#split to split up the rating_list, then
   #   iterate over the ratings and reuse the "When I check..." or
   #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
+  ratings = rating_list.split(",")
+  ratings.each do |rating|
+   if uncheck
+     uncheck "ratings_#{rating}"
+   else
+     check "ratings_#{rating}"
+   end
+  end 
 end
+
+def table_cell(content)
+  /.*<td>#{content}<\/td>.*/m
+end
+Then /I should see ratings: (.*)/ do |rating_list|
+  ratings = rating_list.split(",")
+  ratings.each do |rating|
+    page.body.should match table_cell(rating)
+  end
+end
+
+Then /I should not see ratings: (.*)/ do |rating_list|
+  ratings = rating_list.split(",")
+  ratings.each do |rating|
+    page.body.should_not match table_cell(rating)
+  end
+end
+
+Then /I should see all of the movies/ do
+  Movie.all.each do |movie|
+    page.body.should match table_cell(movie.title)
+  end
+end
+
+Then /I shoud not see all of the movies/ do
+  Movie.all.each do |movie|
+    page.body.should_not match table_cell(movie.title)
+  end
+end
+
+
